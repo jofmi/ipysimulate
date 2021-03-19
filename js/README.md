@@ -1,4 +1,4 @@
-Interactive interface to control and visualize simulations in Python
+Interactive interface to control and visualize agent-based simulations in Jupyter Notebooks. 
 
 Package Install
 ---------------

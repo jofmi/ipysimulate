@@ -1,7 +1,7 @@
 {
   "name": "ipysimulate",
-  "version": "0.1.0",
-  "description": "Interactive interface to control and visualize simulations in Python",
+  "version": "0.1.0a0",
+  "description": "Interactive interface to control and visualize agent-based simulations in Jupyter Notebooks.",
   "author": "Joël Foramitti",
   "main": "lib/index.js",
   "repository": {
