@@ -150,4 +150,3 @@ ipysimulate/labextension/*.tgz
 # Packed lab extensions
 ipysimulate/labextension/
 ipysimulate/nbextension/
-ipysimulate/nbextension2/
