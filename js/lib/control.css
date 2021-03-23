@@ -1,0 +1,98 @@
+.ipysimulate-control {
+    width: calc(100% - 30px);
+    height: calc(100% - 30px);
+    margin: 5px;
+    padding: 10px;
+    background-color: #eeebeb;
+    -moz-box-shadow: 1px 1px 2px 1px  #ccc8c8;
+    -webkit-box-shadow: 1px 1px 2px 1px  #ccc8c8;
+    box-shadow: 1px 1px 2px 1px  #ccc8c8;
+}
+
+.ipysimulate-control .row {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+
+/* Text */
+
+.ipysimulate-control .heading {
+    font-weight: bold;
+    font-size: 18px;
+    /*text-align: center;*/
+    margin-top: 5px;
+}
+
+.ipysimulate-control .centered {
+    text-align: center;
+}
+
+
+/* Control Buttons */
+
+.ipysimulate-control button {
+    /*display: block;*/
+    background-color: #53a0a9;
+    color: white;
+    width: 28px;
+    height: 28px;
+    padding: 0px;
+    margin-right: 5px;
+    /*padding: 10px 10px; Last one is left */
+    font-size: 12px;
+    -moz-box-shadow: 1px 1px 2px 0px #b1adad;
+    -webkit-box-shadow: 1px 1px 2px 0px #b1adad;
+    box-shadow: 1px 1px 2px 0px #b1adad;
+    border: none;
+}
+
+.ipysimulate-control button.last {
+    margin-right: 0px;
+}
+
+.ipysimulate-control button:hover {
+    -moz-box-shadow: 1px 1px 2px 1px #b1adad;
+    -webkit-box-shadow: 1px 1px 2px 1px #b1adad;
+    box-shadow: 1px 1px 2px 1px #b1adad;
+}
+
+
+/* Sliders */
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 1;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+/*
+.slider:hover {
+  opacity: 1;
+}
+*/
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+    border:none;
+  border-radius: 50%;
+  background: #53a0a9;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #53a0a9;
+  cursor: pointer;
+}
