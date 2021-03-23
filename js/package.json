@@ -1,6 +1,6 @@
 {
   "name": "ipysimulate",
-  "version": "0.1.0a0",
+  "version": "0.1.0",
   "description": "Interactive interface to control and visualize agent-based simulations in Jupyter Notebooks.",
   "author": "Joël Foramitti",
   "main": "lib/index.js",
@@ -31,8 +31,11 @@
   },
   "devDependencies": {
     "@jupyterlab/builder": "^3.0.0",
+    "css-loader": "^0.28.7",
+    "style-loader": "^0.18.2",
+    "rimraf": "^2.6.1",
     "webpack": "^5",
-    "rimraf": "^2.6.1"
+    "webpack-cli": "^4.5.0"
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4",
