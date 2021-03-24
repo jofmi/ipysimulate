@@ -7,6 +7,7 @@
     -moz-box-shadow: 1px 1px 2px 1px  #ccc8c8;
     -webkit-box-shadow: 1px 1px 2px 1px  #ccc8c8;
     box-shadow: 1px 1px 2px 1px  #ccc8c8;
+    box-sizing: content-box;
 }
 
 .ipysimulate-control .row {

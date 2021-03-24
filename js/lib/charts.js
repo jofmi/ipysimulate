@@ -84,6 +84,7 @@ var LinechartView = widgets.DOMWidgetView.extend({
 
 		// Create canvas
 		var svg = d3.select(this.container).append("svg")
+			.attr("style", "width: 100%; height: 100%")
 			.attr("viewBox", [0, 0, width, height])
 			//.attr("preserveAspectRatio", "xMinYMin meet")
 			//.attr('width', width)
