@@ -1,21 +1,7 @@
 var widgets = require('@jupyter-widgets/base');
-//var linechart = require('./charts');
+var semver_range = require('../package.json').version;
 require('lodash');
 require('./control.css');
-
-
-/*var LinkModel = widgets.DOMWidgetModel.extend({
-    serializers
-
-}
-export class DirectionalLinkModel extends CoreWidgetModel {
-  static serializers = {
-    ...CoreWidgetModel.serializers,
-    target: { deserialize: unpack_models },
-    source: { deserialize: unpack_models }
-  };*/
-
-
 
 // See control.py for the kernel counterpart to this file.
 
@@ -26,15 +12,59 @@ var ControlModel = widgets.DOMWidgetModel.extend({
         _view_name : 'ControlView',
         _model_module : 'ipysimulate',
         _view_module : 'ipysimulate',
-        _model_module_version : '0.1.0',
-        _view_module_version : '0.1.0',
+        _model_module_version : semver_range,
+        _view_module_version : semver_range,
     }),
 
     initialize: function (attributes, options) {
         widgets.DOMWidgetModel.prototype.initialize.call(this, attributes, options);
+        this.on('msg:custom', this._on_msg.bind(this))
     	this.data = [];
         this.charts = [];
     },
+
+    _on_msg: function (command, buffers) {
+        if (command.what) {
+            switch (command.what) {
+                case 'new_data':
+                    this._handle_new_data(command.data);
+                    break;
+                case 'reset_data':
+                    this._reset_data();
+                    break;
+            }
+        }
+    },
+
+    add_data_paths: function(new_data_paths) {
+        // To be called from the charts
+        var i;
+        let data_paths = [...this.get('data_paths')]
+        for (i = 0; i < new_data_paths.length; i++) {
+            if (!data_paths.includes(new_data_paths[i])) {
+                data_paths.push(new_data_paths[i])
+            }
+        }
+        this.set({'data_paths': data_paths})
+        this.save_changes()
+    },
+
+    _handle_new_data: function(new_data) {
+        // Send new data to each chart
+        var i;
+        for (i = 0; i < this.charts.length; i++) {
+            this.charts[i].update(new_data)
+        }
+    },
+
+    _reset_data: function() {
+        // Send reset command to each chart
+        var i;
+        for (i = 0; i < this.charts.length; i++) {
+            this.charts[i].reset()
+        }
+    },
+
 });
 
 
@@ -70,6 +100,7 @@ var ControlView = widgets.DOMWidgetView.extend({
     },
 
     click_info: function(inputEvent) {
+        // TODO Make something useful with this button
         alert(this.model.get('sim_info'))
     },
 
@@ -79,7 +110,7 @@ var ControlView = widgets.DOMWidgetView.extend({
         // Handle traitlet changes
         this.model.on('change:running', this.running_changed, this);
         this.model.on('change:t', this.t_changed, this);
-        this.model.on('change:new_data', this.data_changed, this);
+        //this.model.on('change:new_data', this.data_changed, this);
         this.model.on('change:reset_counter', this.reset_changed, this);
         
         // Control interface
@@ -108,9 +139,9 @@ var ControlView = widgets.DOMWidgetView.extend({
         this.step_button.className = "ctr_btn fa fa-step-forward";
         this.control_line.appendChild(this.step_button);
         
-        // Restart button
+        // Restart button (fa-flip-horizontal)
         this.redo_button = document.createElement("BUTTON");
-        this.redo_button.className = "ctr_btn fa fa-repeat fa-flip-horizontal";
+        this.redo_button.className = "ctr_btn fa fa-repeat";
         this.control_line.appendChild(this.redo_button);
 
         // Info button
@@ -177,33 +208,6 @@ var ControlView = widgets.DOMWidgetView.extend({
 
     t_changed: function() {
         this.output2.textContent = this.model.get('t');
-    },
-    
-    data_changed: function() {
-        
-        // Add new data to data
-        let new_data = this.model.get('new_data')
-        for (const [key, value] of Object.entries(new_data)) {
-            this.model.data.push(...value) //[key] TODO CREATE DATA CATEGORIES
-        }
-
-        // Unlock back-end for next data update
-        this.send({event: 'sync_finished'});
-
-        console.log("Data changed")
-        console.log(this.model)
-		console.log(this.model.charts)
-        console.log(this.model.data)
-
-
-        // Update visualization TODO CREATE LOOP & GENERAL UPDATE FUNCTION
-        var i;
-        for (i = 0; i < this.model.charts.length; i++) {
-            console.log("Accessing chart")
-            console.log(this.model.charts[i])
-            console.log(this.model.charts[i].update)
-            this.model.charts[i].update(this.model.data)
-        }
     },
     
     reset_changed: function() {

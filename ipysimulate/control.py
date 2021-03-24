@@ -2,10 +2,10 @@ import traitlets
 import ipywidgets
 import threading
 import time
-import json
-import random
+import ipysimulate
 
 # See js/lib/control.js for the frontend counterpart to this file.
+semver_range = "~" + ipysimulate.__version__
 
 
 @ipywidgets.register
@@ -16,36 +16,39 @@ class Control(ipywidgets.DOMWidget):
     
     _view_name = traitlets.Unicode('ControlView').tag(sync=True)
     _view_module = traitlets.Unicode('ipysimulate').tag(sync=True)
-    _view_module_version = traitlets.Unicode('^0.1.0').tag(sync=True)
+    _view_module_version = traitlets.Unicode(semver_range).tag(sync=True)
     _model_name = traitlets.Unicode('ControlModel').tag(sync=True)
     _model_module = traitlets.Unicode('ipysimulate').tag(sync=True)
-    _model_module_version = traitlets.Unicode('^0.1.0').tag(sync=True)
+    _model_module_version = traitlets.Unicode(semver_range).tag(sync=True)
 
     running = traitlets.Bool(False).tag(sync=True)
     reset = traitlets.Bool(False).tag(sync=True)
-    reset_counter = traitlets.Integer(False).tag(sync=True)
-    new_data = traitlets.Dict({}).tag(sync=True)
+
     parameters = traitlets.Dict({}).tag(sync=True)
+    data_paths = traitlets.List().tag(sync=True)
     t = traitlets.Integer(0).tag(sync=True)
-    sim_name = traitlets.Unicode('').tag(sync=True)
-    sim_info = traitlets.Unicode('').tag(sync=True)
+
+    sim_name = traitlets.Unicode().tag(sync=True)
+    sim_info = traitlets.Unicode().tag(sync=True)
 
     # Initiation - Don't start any threads here ----------------------------- #
     
-    def __init__(self, model, parameters=None, model_kwargs=None, **kwargs):
-        super().__init__(**kwargs)  # Initiate front-end TODO What do these kwargs do
+    def __init__(self, model, parameters=None):
+        super().__init__()  # Initiate front-end
         self.on_msg(self._handle_button_msg)  # Handle front-end messages
-        self.sync_event = threading.Event()  # To block thread while syncing
-        self.sync_event.set()  # Unlock event at the beginning
         self.thread = None  # Placeholder for simulation threads
+
+        # TODO ADD Conversion from param ranges
         self.parameters = parameters if parameters else {}
-        model_kwargs = {} if model_kwargs is None else model_kwargs
-        self.model = model(self.parameters, **model_kwargs)  # Initiate model
-        self.sim_name = model.__name__
-        self.sim_info = model.__doc__
+
+        self.model = model
+        self.model.set_parameters(self.parameters)
+
+        self.sim_name = model.name if hasattr(model, 'name') else 'Simulation'
+        self.sim_info = model.info if hasattr(model, 'info') else ''
         
     # Methods to be called from the front-end ------------------------------- #
-    
+
     def _handle_button_msg(self, _, content, buffers):
         """ Handles messages from the front-end 
         by calling method of same name as msg. """
@@ -71,39 +74,54 @@ class Control(ipywidgets.DOMWidget):
         self.thread = threading.Thread(target=self.run_reset)
         self.thread.start()
         
-    def sync_finished(self):
-        """ Allow :func:`Control.send_data` to sync new data. """
-        self.sync_event.set()  # Unlock event to send data
-        
     # Methods to be called only within threads ------------------------------ #
 
-    def sync_data(self):
-        """ Send new data to front-end by syncing :attr:`Control.new_data`. """
-        self.sync_event.wait()  # Wait until last sync is finished
-        self.new_data = self.model.get_step_data()  # Sync new data
-        self.sync_event.clear()  # Lock until this sync will be finished
+    def sync_data(self, data_paths):
+        """ Retrieve new data from the simulation model and send it
+        to front-end.
+
+        Arguments:
+            data_paths (list of str): A list of paths for each attribute that
+                should be retrieved from `self.model`. E.g. ['x', 'sub_obj.x']
+                would load `self.model.x` and `self.model.sub_obj.x`.
+        """
+
+        new_data = {}
+        for data_path in self.data_paths:
+
+            # Move to target object
+            obj = self.model
+            for attr in data_path.split('.'):
+                obj = getattr(obj, attr)
+
+            # TODO Handle NAN
+
+            # Add target object to new data
+            new_data[data_path] = obj
+
+        self.send({"what": "new_data", "data": new_data})
 
     def run_reset(self):
         """ Reset simulation by clearing front-end data,
         calling `model.sim_reset()`, and sending initial data to front-end."""
-        self.reset_counter = self.reset_counter + 1  # Trigger front-end reset
+        self.send({"what": "reset_data"})  # Reset frontend model
         self.model.sim_reset()  # Reset backend model
         self.t = self.model.t
-        self.sync_data()
+        self.sync_data(self.data_paths)
 
     def run_setup(self):
         """ Initiate simulation by calling `model.sim_setup()`
         and sending initial data to front-end. """
         self.model.sim_setup()
         self.t = self.model.t
-        self.sync_data()
+        self.sync_data(self.data_paths)
     
     def run_single_step(self):
         """ Run a single simulation step by calling `model.sim_step()`,
         and sending new data to front-end. """
         self.model.sim_step()
         self.t = self.model.t
-        self.sync_data()
+        self.sync_data(self.data_paths)
         
     def run_simulation(self):
         """ Start or continue the simulation by repeatedly calling

@@ -1,4 +1,5 @@
 var widgets = require('@jupyter-widgets/base');
+var semver_range = require('../package.json').version;
 var d3 = require('d3');
 require('./charts.css');
 require('lodash');
@@ -11,63 +12,56 @@ var LinechartModel = widgets.DOMWidgetModel.extend({
         _view_name : 'LinechartView',
         _model_module : 'ipysimulate',
         _view_module : 'ipysimulate',
-        _model_module_version : '0.1.0',
-        _view_module_version : '0.1.0',
+        _model_module_version : semver_range,
+        _view_module_version : semver_range,
     }),
 
 	initialize: function (attributes, options) {
         widgets.DOMWidgetModel.prototype.initialize.call(this, attributes, options);
-		let promise = this.widget_manager.get_model(this.get('_control_id'))
+
+        // Connect to control
+        let promise = this.widget_manager.get_model(this.get('_control_id'))
 		promise.then(this.connect_control.bind(this));
+
+        // Initialize data
+		this.data = []
     },
 
     connect_control: function(control_model) {
     	// Connect chart to control
 		this.control = control_model
 		this.control.charts.push(this)
+		this._update_config()
 	},
 
-	update: function(data) {
-    	// Send data to all views
-		for (var key in this.views){
-			this.views[key].then(this.update_view.bind(null, data))
+	_update_config: function() {
+    	let config = this.get('config')
+		this.control.add_data_paths([config['x'], config['y']])
+	},
+
+	update: function(new_data) {
+		this.data.push(new_data) // Append new data
+		for (var key in this.views){ // Send updated data to all views
+			this.views[key].then(this._update_view.bind(null, this.data))
 		}
 	},
 
-	update_view: function(data, view) {
-    	// Send data to view
+	_update_view: function(data, view) {
     	view.update(data)
+	},
+
+	reset: function() {
+    	this.data = [] // Clear data
+		for (var key in this.views){ // Send cleared data to all views
+			this.views[key].then(this._reset_view.bind(null, this.data))
+		}
+	},
+
+	_reset_view: function(data, view) {
+		view.update(data)
 	}
 
 });
-
-
-function responsivefy(svg) {
-    // get container + svg aspect ratio
-    var container = d3.select(svg.node().parentNode),
-        width = parseInt(svg.style("width")),
-        height = parseInt(svg.style("height")),
-        aspect = width / height;
-
-    // add viewBox and preserveAspectRatio properties,
-    // and call resize so that svg resizes on inital page load
-    svg.attr("viewBox", "0 0 " + width + " " + height)
-        .attr("perserveAspectRatio", "xMinYMid")
-        .call(resize);
-
-    // to register multiple listeners for same event type,
-    // you need to add namespace, i.e., 'click.foo'
-    // necessary if you call invoke this function for multiple svgs
-    // api docs: https://github.com/mbostock/d3/wiki/Selections#on
-    d3.select(window).on("resize." + container.attr("id"), resize);
-
-    // get width of container and resize svg to fit it
-    function resize() {
-        var targetWidth = parseInt(container.style("width"));
-        svg.attr("width", targetWidth);
-        svg.attr("height", Math.round(targetWidth / aspect));
-    }
-}
 
 
 var LinechartView = widgets.DOMWidgetView.extend({
@@ -122,7 +116,7 @@ var LinechartView = widgets.DOMWidgetView.extend({
 		this.xAxis = xAxis
 		this.yAxis = yAxis
 
-		this.update(this.model.control.data)
+		this.update(this.model.data)
 
 	},
 
