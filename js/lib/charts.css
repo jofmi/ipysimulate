@@ -1,13 +1,14 @@
 .ipysimulate-chart {
   background-color: #ffffff;
-  /*float: left;*/
   width: calc(100% - 10px);
-  /*width: calc(100% - 150px);*/
   height: calc(100% - 10px);
   margin: 5px;
   -moz-box-shadow: 1px 1px 2px 1px  #ccc8c8;
   -webkit-box-shadow: 1px 1px 2px 1px  #ccc8c8;
   box-shadow: 1px 1px 2px 1px  #ccc8c8;
   box-sizing: content-box;
-  /*padding: 10px;*/
+}
+
+.chart-label {
+  font-size: 13px;
 }

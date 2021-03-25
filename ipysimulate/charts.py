@@ -20,5 +20,6 @@ class Linechart(ipywidgets.DOMWidget):
     def __init__(self, control, y, x='t', **kwargs):
         self._control = control
         self._control_id = control.comm.comm_id
+        y = y if isinstance(y, (tuple, list)) else [y]
         self.config = {'x': x, 'y': y}
         super().__init__(**kwargs)

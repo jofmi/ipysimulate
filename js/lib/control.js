@@ -19,7 +19,7 @@ var ControlModel = widgets.DOMWidgetModel.extend({
     initialize: function (attributes, options) {
         widgets.DOMWidgetModel.prototype.initialize.call(this, attributes, options);
         this.on('msg:custom', this._on_msg.bind(this))
-    	this.data = [];
+    	this.data = [];  // TODO is this depreciated?
         this.charts = [];
     },
 
