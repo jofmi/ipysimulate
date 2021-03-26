@@ -1,6 +1,7 @@
 from ._version import __version__
 from .charts import *
 from .control import *
+from .simulation import *
 
 
 def _jupyter_labextension_paths():
