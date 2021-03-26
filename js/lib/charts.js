@@ -17,7 +17,8 @@ var LinechartModel = widgets.DOMWidgetModel.extend({
     }),
 
 	initialize: function (attributes, options) {
-        widgets.DOMWidgetModel.prototype.initialize.call(this, attributes, options);
+        widgets.DOMWidgetModel.prototype
+			.initialize.call(this, attributes, options);
 
         // Connect to control
         let promise = this.widget_manager.get_model(this.get('_control_id'))
@@ -153,10 +154,10 @@ var LinechartView = widgets.DOMWidgetView.extend({
 		  .enter()
 		  .append("circle")
 		    .attr("cx", width - margin.right - 5)
-		    .attr("cy", function(d,i){ return margin.top + i*25})
+		    .attr("cy", function(d, i){ return margin.top + i*25})
 		    .attr("r", 7)
 		    .style("stroke", 'white')
-		    .style("fill", function(d,i){ return color(i)})
+		    .style("fill", function(d, i){ return color(i)})
 
 		// Add one dot in the legend for each name.
 		svg.selectAll("mylabels")
@@ -165,7 +166,7 @@ var LinechartView = widgets.DOMWidgetView.extend({
 		  .append("text")
 		    .attr("class", "chart-label")
 		    .attr("x", width - margin.right - 17)
-		    .attr("y", function(d,i){ return margin.top + i*25 + 4.5})
+		    .attr("y", function(d, i){ return margin.top + i*25 + 4.5})
 		    .text(function(d){ return d.name})
 		    .attr("text-anchor", "end")
 

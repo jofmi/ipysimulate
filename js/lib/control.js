@@ -17,9 +17,9 @@ var ControlModel = widgets.DOMWidgetModel.extend({
     }),
 
     initialize: function (attributes, options) {
-        widgets.DOMWidgetModel.prototype.initialize.call(this, attributes, options);
-        this.on('msg:custom', this._on_msg.bind(this))
-    	this.data = [];  // TODO is this depreciated?
+        widgets.DOMWidgetModel.prototype
+            .initialize.call(this, attributes, options);
+        this.on('msg:custom', this._on_msg.bind(this));
         this.charts = [];
     },
 
@@ -46,7 +46,7 @@ var ControlModel = widgets.DOMWidgetModel.extend({
             }
         }
         this.set({'data_paths': data_paths})
-        this.save_changes()
+        this.save_changes()  // Sync JS & Python
     },
 
     _handle_new_data: function(new_data) {
@@ -73,17 +73,17 @@ var ControlView = widgets.DOMWidgetView.extend({
     // React to control button events -------------------------------------- //
     click_play: function(inputEvent) {
         // Continue simulation if model is idle, else pause.
-        if (this.model.get('running') === false) {
+        if (this.model.get('is_running') === false) {
             this.send({event: 'continue_simulation'});
         } else {  
-            this.model.set({'running':false}); 
+            this.model.set({'is_running':false});
             this.touch(); // Sync JS & Python              
         }
     },
     
     click_step: function(inputEvent) {
         // Run single step if model is idle.
-        if (this.model.get('running') == false) {  
+        if (this.model.get('is_running') == false) {
             this.send({event: 'increment_simulation'});
         }
     },
@@ -91,8 +91,8 @@ var ControlView = widgets.DOMWidgetView.extend({
     click_redo: function(inputEvent) {
         // Set to reset after end of step, if model is runnning.
         // Reset through function call if model is idle.
-        if (this.model.get('running') == true) {
-            this.model.set({'reset':true, 'running':false});
+        if (this.model.get('is_running') == true) {
+            this.model.set({'do_reset':true, 'is_running':false});
             this.touch(); // Sync JS & Python 
         } else {
             this.send({event: 'reset_simulation'});
@@ -100,18 +100,16 @@ var ControlView = widgets.DOMWidgetView.extend({
     },
 
     click_info: function(inputEvent) {
-        // TODO Make something useful with this button
-        alert(this.model.get('sim_info'))
+        // TODO Do something useful with this button
+        // alert(this.model.get(''))
     },
 
     // Render control interface -------------------------------------------- //
     render: function() {
 
         // Handle traitlet changes
-        this.model.on('change:running', this.running_changed, this);
+        this.model.on('change:is_running', this.is_running_changed, this);
         this.model.on('change:t', this.t_changed, this);
-        //this.model.on('change:new_data', this.data_changed, this);
-        this.model.on('change:reset_counter', this.reset_changed, this);
         
         // Control interface
         this.control = document.createElement("div");
@@ -121,7 +119,7 @@ var ControlView = widgets.DOMWidgetView.extend({
         // Heading
         this.heading = document.createElement("div");
         this.heading.className = "heading"
-        this.heading.textContent = this.model.get('sim_name')
+        this.heading.textContent = this.model.get('name')
         this.control.appendChild(this.heading);
 
         // Control buttons ------------------------------------------------- //
@@ -150,7 +148,6 @@ var ControlView = widgets.DOMWidgetView.extend({
         this.control_line.appendChild(this.info_button);
 
         // Listening to events in JS Front-End
-        // TODO inputEvent redundant
         this.play_button.addEventListener("click",
             (inputEvent => this.click_play()), false);
         this.redo_button.addEventListener("click",
@@ -178,8 +175,6 @@ var ControlView = widgets.DOMWidgetView.extend({
 
         // Sliders --------------------------------------------------------- //
 
-        // <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
-
         this.control_line3 = document.createElement("div");
         this.control_line3.className = "row"
         this.control.appendChild(this.control_line3);
@@ -198,8 +193,8 @@ var ControlView = widgets.DOMWidgetView.extend({
     },
 
     // React to tratilet changes ------------------------------------------- //
-    running_changed: function() {
-        if (this.model.get('running') === true) {
+    is_running_changed: function() {
+        if (this.model.get('is_running') === true) {
             this.play_button.className = "ctr_btn fa fa-pause";
         } else {
             this.play_button.className = "ctr_btn fa fa-play";
