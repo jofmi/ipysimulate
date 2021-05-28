@@ -4,7 +4,6 @@
 
 import sys
 import os
-from ipysimulate import __version__  # Agentpy must be installed first
 
 # -- Path setup --------------------------------------------------------------
 
@@ -19,7 +18,7 @@ copyright = '2021, Joël Foramitti'
 author = 'Joël Foramitti'
 
 # The full version, including alpha/beta/rc tags
-release = __version__
+release = '0.2.0'  # TODO Automatic import
 
 # -- General configuration ---------------------------------------------------
 
