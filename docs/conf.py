@@ -4,7 +4,7 @@
 
 import sys
 import os
-
+import ipysimulate
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -18,7 +18,7 @@ copyright = '2021, Joël Foramitti'
 author = 'Joël Foramitti'
 
 # The full version, including alpha/beta/rc tags
-release = '0.2.0'  # TODO Automatic import
+release = ipysimulate.__version__  # TODO Automatic import
 
 # -- General configuration ---------------------------------------------------
 
