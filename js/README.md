@@ -1,4 +1,5 @@
-Interactive interface to control and visualize agent-based simulations in Jupyter Notebooks. 
+Tools to create interactive simulations with IPython and Jupyter.
+For more information, visit https://github.com/JoelForamitti/ipysimulate.
 
 Package Install
 ---------------

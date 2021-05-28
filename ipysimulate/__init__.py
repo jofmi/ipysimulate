@@ -1,8 +1,8 @@
 from ._version import __version__
 from .charts import *
-from .control import *
+from .control import Control
 from .simulation import *
-
+from .parameters import *
 
 def _jupyter_labextension_paths():
     """Called by Jupyter Lab Server to detect if it is a valid labextension and

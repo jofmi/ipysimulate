@@ -20,7 +20,9 @@ log.info('setup.py entered')
 log.info('$PATH=%s' % os.environ['PATH'])
 
 name = 'ipysimulate'
-LONG_DESCRIPTION = 'Interactive interface to control and visualize simulations in Python'
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 # Get ipysimulate version
 version = get_version(pjoin(name, '_version.py'))
@@ -47,8 +49,8 @@ cmdclass['jsdeps'] = combine_commands(
 setup_args = dict(
     name=name,
     version=version,
-    description='Interactive interface to control and visualize simulations in Python',
-    long_description=LONG_DESCRIPTION,
+    description='Tools to create interactive simulations with IPython and Jupyter.',
+    long_description=long_description,
     include_package_data=True,
     install_requires=[
         'ipywidgets>=7.6.0',

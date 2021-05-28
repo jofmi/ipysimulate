@@ -19,49 +19,44 @@ var LinechartModel = widgets.DOMWidgetModel.extend({
 	initialize: function (attributes, options) {
         widgets.DOMWidgetModel.prototype
 			.initialize.call(this, attributes, options);
-
-        // Connect to control
-        let promise = this.widget_manager.get_model(this.get('_control_id'))
-		promise.then(this.connect_control.bind(this));
+		this.on('msg:custom', this._on_msg.bind(this));
 
         // Initialize data
+		this.xlabel = this.get('xlabel');
+		this.ylabels = this.get('ylabels');
 		this.reset_data()
     },
 
-	reset_data: function () {
-		var config = this.get('config');
-		this.data = {'x': [], 'series': []};
-		this.data_ref = {};
-		this.data_ref[config.x] = this.data.x
-		var i;
-		for (i = 0; i < config.y.length; i++) {
-			let series_entry = {'name': config.y[i], 'values': []}
-			this.data.series.push(series_entry)
-			this.data_ref[config.y[i]] = series_entry.values
-		}
-	},
-
-    connect_control: function(control_model) {
-    	// Connect chart to control
-		this.control = control_model
-		this.control.charts.push(this)
-		this._update_config()
-	},
-
-	_update_config: function() {
-    	let config = this.get('config')
-		this.control.add_data_paths([config['x']])
-		this.control.add_data_paths(config['y'])
-	},
+	_on_msg: function (command, buffers) {
+        if (command.what) {
+            switch (command.what) {
+                case 'new_data':
+                    this.update(command.data);
+                    break;
+                case 'reset_data':
+                    this.reset();
+                    break;
+            }
+        }
+    },
 
 	update: function(new_data) {
 		// Append new data
-		for (const [key, value] of Object.entries(new_data)) {
-			this.data_ref[key].push(value)
+		this.data.x.push(new_data.x)
+		for (const [key, value] of Object.entries(new_data.series)) {
+			this.series[key].push(value)
 		}
-
 		// Send updated data to all views
-		for (var key in this.views){
+		this.update_views()
+	},
+
+	reset: function() {
+    	this.reset_data() // Clear data
+		this.update_views()
+	},
+
+	update_views: function() {
+		for (var key in this.views) { // Send cleared data to all views
 			this.views[key].then(this._update_view.bind(null, this.data))
 		}
 	},
@@ -70,16 +65,17 @@ var LinechartModel = widgets.DOMWidgetModel.extend({
     	view.update(data)
 	},
 
-	reset: function() {
-    	this.reset_data() // Clear data
-		for (var key in this.views){ // Send cleared data to all views
-			this.views[key].then(this._reset_view.bind(null, this.data))
+	reset_data: function () {
+		this.data = {'x': [], 'series': []};
+		this.series = {}
+		var i;
+		for (i = 0; i < this.ylabels.length; i++) {
+			let label = this.ylabels[i]
+			let series_entry = {'name': label, 'values': []}
+			this.data.series.push(series_entry)
+			this.series[label] = series_entry.values
 		}
 	},
-
-	_reset_view: function(data, view) {
-		view.update(data)
-	}
 
 });
 
@@ -95,9 +91,9 @@ var LinechartView = widgets.DOMWidgetView.extend({
         this.container.className = 'ipysimulate-chart'
         this.el.appendChild(this.container);
 
-		var width = 600;
-		var height = 400;
-		var margin = {top: 20, right: 30, bottom: 30, left: 40}
+		var width = 500;
+		var height = 300;
+		var margin = {top: 20, right: 30, bottom: 40, left: 40}
 
 		var svg = d3.select(this.container).append("svg")
 			.attr("style", "width: 100%; height: 100%")
@@ -125,7 +121,7 @@ var LinechartView = widgets.DOMWidgetView.extend({
 		    .attr("text-anchor", "middle")
 		    .attr("x", margin.left + (width - margin.right - margin.left)/2 )
 		    .attr("y", height - 5)
-		    .text("Time-step t");
+		    .text(this.model.xlabel);
 
 		// Content --------------------------------------------------------- //
 
@@ -177,9 +173,6 @@ var LinechartView = widgets.DOMWidgetView.extend({
 		this.y = y
 		this.xAxis = xAxis
 		this.yAxis = yAxis
-
-		// Initiate (necessary?) ------------------------------------------------ //
-		this.update(this.model.data)
 
 	},
 
