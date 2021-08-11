@@ -21,9 +21,8 @@ It includes a simulation control panel,
 widgets to adjust parameters at runtime,
 and dynamically updating d3.js charts.
 
-For application examples,
-please take a look at the
-`AgentPy documentation <https://agentpy.readthedocs.io/en/stable/guide_interactive.html>`_.
+For application examples, please take a look at the documentation of
+`AgentPy <https://agentpy.readthedocs.io/en/stable/guide_interactive.html>`_.
 
 This library is still in an early stage of development,
 and more features will follow in the future.
@@ -37,6 +36,7 @@ Contributions are very welcome :)
    :maxdepth: 2
 
    installation
+   overview
    reference
 
 .. only:: html

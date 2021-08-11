@@ -29,24 +29,13 @@ class Control(ipywidgets.DOMWidget):
 
     Arguments:
         model:
-            A model that can perform a simulation.
-            Must have the following attributes:
-
-            - sim_setup (method): Prepares the simulation (time-step 0).
-            - sim_step (method): Performs a single step of the simulation.
-            - sim_reset (method): Resets model to initial state before setup.
-            - set_parameters (method):
-              Takes a dictionary with parameter names and values as an input
-              and uses them to update the model's parameters.
-            - running (bool): Indicator whether the simulation is still active.
-
+            A :ref:`simulation model <simulation_model>` with discrete steps.
         parameters (dict, optional):
-            Parameters for the simulation (default None).
+            Dictionary of parameter names and values (default None).
             Entries of type :class:`Range`, :class:`IntRange`,
             and :class:`Values` will be displayed as interactive widgets.
-            The equivalent classes from the agentpy package can also be used.
         variables (str of list of str, optional):
-            Model attributes to display in the control panel (default 't').
+            Model attributes to display in the control panel (default None).
     """
 
     # Traitlet declarations ------------------------------------------------- #
@@ -62,7 +51,7 @@ class Control(ipywidgets.DOMWidget):
     do_reset = traitlets.Bool(False).tag(sync=True)
 
     _variables = traitlets.Dict().tag(sync=True)
-    parameters = traitlets.Dict({}).tag(sync=True)
+    parameters = traitlets.Dict().tag(sync=True)
     data_paths = traitlets.List().tag(sync=True)
     _pwidgets = traitlets.List().tag(sync=True)
     t = traitlets.Integer(0).tag(sync=True)
@@ -71,15 +60,13 @@ class Control(ipywidgets.DOMWidget):
 
     # Initiation - Don't start any threads here ----------------------------- #
     
-    def __init__(self, model, parameters=None, variables='t'):
+    def __init__(self, model, parameters=None, variables=None):
         super().__init__()  # Initiate front-end
         self.on_msg(self._handle_button_msg)  # Handle front-end messages
         self.thread = None  # Placeholder for simulation threads
         self._pre_pwidgets = []
         self._pdtypes = {}
 
-        # TODO ADD Conversion from param ranges
-        # TODO Standalone Range/Values/Switch Classes
         self.parameters = {}
         if parameters:
             for k, v in parameters.items():
@@ -104,8 +91,6 @@ class Control(ipywidgets.DOMWidget):
         self._variables = {k: None for k in self._var_keys}
 
         self.charts = []
-
-        #self.name = name if name else type(model).__name__
 
     # Callbacks ------------------------------------------------------------- #
 
