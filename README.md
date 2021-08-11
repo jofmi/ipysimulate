@@ -5,19 +5,14 @@ IPySimulate - Interactive simulations for Python
 [![GitHub](https://img.shields.io/github/license/joelforamitti/ipysimulate)](https://github.com/JoelForamitti/ipysimulate/blob/master/LICENSE)
 [![Documentation Status](https://readthedocs.org/projects/ipysimulate/badge/?version=stable)](https://ipysimulate.readthedocs.io/en/stable/?badge=stable)
 
-The ipysimulate library provides tools to create 
-interactive simulations with IPython and Jupyter. 
-It includes a simulation control panel, 
-widgets to adjust parameters at runtime, 
-and dynamically updating d3.js charts. 
+Tools to create interactive simulations with IPython and Jupyter,
+including a control panel, widgets to adjust parameters at runtime, 
+and dynamic [D3.js](https://d3js.org/) visualizations. 
+This package is still in an early stage of development. 
+Contributions are welcome :)
 
-For application examples, 
-check out this [user guide](https://agentpy.readthedocs.io/en/stable/guide_interactive.html) 
-of the [AgentPy](https://github.com/JoelForamitti/agentpy) documentation.
-
-This library is still in an early stage of development, 
-and more features will follow in the future. 
-Contributions are very welcome :)
+**Documentation**: https://ipysimulate.readthedocs.io/  
+**Application examples**: https://agentpy.readthedocs.io/en/stable/guide_interactive.html
 
 Installation
 ------------
