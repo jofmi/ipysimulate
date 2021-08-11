@@ -51,6 +51,7 @@ setup_args = dict(
     version=version,
     description='Tools to create interactive simulations with IPython and Jupyter.',
     long_description=long_description,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     install_requires=[
         'ipywidgets>=7.6.0',
