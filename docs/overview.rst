@@ -19,12 +19,11 @@ Simulation model
 ################
 
 The simulation model is a class that can perform a discrete simulation steps.
-One can either use models from a compatible package like `AgentPy <https://agentpy.readthedocs.io/>`_.,
-or define custom simulation models with the following attributes:
+The package is built to be compatible with model's that are written in `AgentPy <https://agentpy.readthedocs.io/>`_.
+Alternatively, one can define custom simulation models as classes with the following attributes:
 
 - sim_setup (method): Prepares the simulation (time-step 0).
 - sim_step (method): Performs a single step of the simulation.
-- sim_reset (method): Resets model to initial state before setup.
 - set_parameters (method):
   Takes a dictionary with parameter names and values as an input
   and uses them to update the model's parameters.
@@ -42,9 +41,6 @@ A simple model that increases a variable `x` by a parameter `dx` per step would 
             self.x += self.dx
             if self.x > self.x_max:
                 self.running = False
-
-        def sim_reset(self):
-            self.sim_setup()
 
         def set_parameters(self, parameters):
             self.dx = parameters['dx']
@@ -88,5 +84,5 @@ Custom widgets
 
 Alternatively, it is also possible to define custom visualization widgets:
 
-- :class:`CustomWidget` for visualizations with JavaScript and D3.
+- :class:`CustomWidget` for visualizations with JavaScript and D3. Go to :doc:`guide_custom_widgets` for a full tutorial.
 - :class:`Matplot` for visualizations with Matplotlib.

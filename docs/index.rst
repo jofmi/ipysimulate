@@ -26,7 +26,7 @@ For application examples, please take a look at the documentation of
 
 This library is still in an early stage of development,
 and more features will follow in the future.
-Contributions are very welcome :)
+Contributions are welcome :)
 
 .. only:: html
 
@@ -37,7 +37,9 @@ Contributions are very welcome :)
 
    installation
    overview
+   guide_custom_widgets
    reference
+   changelog
 
 .. only:: html
 
