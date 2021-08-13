@@ -32,15 +32,15 @@ class CustomWidget(ipywidgets.DOMWidget, Ipswidget):
             The simulation control panel.
         source (dict of str):
             Dictionary of strings with javascript functions
-            that define the visualization.
+            that define the visualization of the widget.
             Possible entries are:
 
-                - 'init': Called when a new view is initiated.
+                - 'setup': Called when a new view is rendered.
+                - 'update': Called when new data is synched.
                 - 'reset': Called when the simulation is reset.
-                - 'update': Called after every simulation step,
-                  as well as after 'render' and 'reset'.
 
-            The view object is passed to each function with the keyword `view`.
+            Functions can access the widget view and widget model with
+            `view` and `view.model`. The D3 library can be accessed with `d3`.
             Collected data is passed to the `update` function as `data`.
         config (dict):
             Configuration data that can be accessed by the visualization
@@ -61,7 +61,7 @@ class CustomWidget(ipywidgets.DOMWidget, Ipswidget):
     config = traitlets.Dict().tag(sync=True)
     source = traitlets.Dict().tag(sync=True)
 
-    def __init__(self, control, source, config, data):
+    def __init__(self, control, source, config=None, data=None):
 
         self._control = control
         self._control_id = control.comm.comm_id
@@ -70,11 +70,12 @@ class CustomWidget(ipywidgets.DOMWidget, Ipswidget):
         self.model = control.model
 
         # Custom attributes
-        self.source = {'init': '', 'update': '', 'reset': ''}
+        self.source = {'setup': '', 'update': '', 'reset': ''}
         self.source.update(source)  # Add passed functions
 
-        # Config
-        self.config = config
+        # Configuration & data collectors
+        self.config = config if config else {}
+        data = data if data else {}
         self.collectors = {k: self._collector(v) for k, v in data.items()}
 
         super().__init__()
