@@ -133,7 +133,7 @@ class Control(ipywidgets.DOMWidget):
         by calling method of same name as msg. """
         getattr(self, content.get('event', ''))(**content)
 
-    def update_parameter(self, k, v, **kwargs):
+    def update_parameter(self, k, v):
         self.model.p[k] = self._pdtypes[k](v)
 
     def setup_simulation(self, **kwargs):
@@ -152,7 +152,7 @@ class Control(ipywidgets.DOMWidget):
         self.thread.start()
         
     def reset_simulation(self, **kwargs):
-        """ Reset simulation (in thread!) """
+        """ Reset graphs and simulation. """
         self.thread = threading.Thread(target=self.reset)
         self.thread.start()
         
@@ -171,8 +171,7 @@ class Control(ipywidgets.DOMWidget):
         calling `model.sim_reset()`, and sending initial data to front-end."""
         for chart in self.charts:
             chart.reset_data()
-        self.model.sim_reset()  # Reset backend model
-        self.run_setup()  # Setup backend model again
+        self.run_setup()  # Reset backend model by calling setup again
 
     def run_setup(self):
         """ Initiate simulation by calling `model.sim_setup()`
