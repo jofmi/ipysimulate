@@ -1,9 +1,10 @@
+// Interactive control panel for simulations
+// See control.py for the kernel counterpart to this file.
+
 var widgets = require('@jupyter-widgets/base');
 var semver_range = require('../package.json').version;
-require('lodash');
 require('./control.css');
-
-// See control.py for the kernel counterpart to this file.
+require('lodash');
 
 
 var ControlModel = widgets.DOMWidgetModel.extend({
@@ -19,51 +20,7 @@ var ControlModel = widgets.DOMWidgetModel.extend({
     initialize: function (attributes, options) {
         widgets.DOMWidgetModel.prototype
             .initialize.call(this, attributes, options);
-        this.on('msg:custom', this._on_msg.bind(this));
         this.charts = [];
-    },
-
-    _on_msg: function (command, buffers) {
-        if (command.what) {
-            switch (command.what) {
-                case 'new_data':
-                    this._handle_new_data(command.data);
-                    break;
-                case 'reset_data':
-                    this._reset_data();
-                    break;
-            }
-        }
-    },
-
-    add_data_paths: function(new_data_paths) {
-        // To be called from the charts
-        var i;
-        let data_paths = [...this.get('data_paths')]
-        for (i = 0; i < new_data_paths.length; i++) {
-            if (!data_paths.includes(new_data_paths[i])) {
-                data_paths.push(new_data_paths[i])
-            }
-        }
-        this.set({'data_paths': data_paths})
-        this.save_changes()  // Sync JS & Python
-    },
-
-    _handle_new_data: function(new_data) {
-        // Data is handled by each chart individually
-        // Send new data to each chart
-        // var i;
-        // for (i = 0; i < this.charts.length; i++) {
-        //     this.charts[i].update(new_data)
-        // }
-    },
-
-    _reset_data: function() {
-        // Send reset command to each chart
-        var i;
-        for (i = 0; i < this.charts.length; i++) {
-            this.charts[i].reset()
-        }
     },
 
 });
